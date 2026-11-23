@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MomentMem</title>
+  <meta name="description" content="MomentMem: Memorizing Key Moments for Robot Manipulation. A VLM memorizer keeps raw keyframes of briefly visible evidence; a VLA executor acts on them. Includes VMBench, a benchmark for visual moment memory.">
+  <meta property="og:title" content="MomentMem: Memorizing Key Moments for Robot Manipulation">
+  <meta property="og:description" content="Robots that remember what they saw only for a moment.">
+  <meta property="og:image" content="static/images/overview.png">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232a78d6'/><rect x='7' y='9' width='8' height='14' rx='2' fill='white'/><rect x='17' y='9' width='8' height='14' rx='2' fill='white' opacity='.55'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/style.css">
+  <script>
+    try { var t = localStorage.getItem('mm-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">MomentMem</a>
+    <div class="links">
+      <a href="#problem">Problem</a>
+      <a href="#vmbench">VMBench</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#real">Real Robot</a>
+      <a href="#citation">Citation</a>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle theme">◐</button>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <h1><span class="accent">MomentMem</span></h1>
+    <div class="subtitle">Memorizing Key Moments for Robot Manipulation</div>
+    <div class="authors">
+      <span>Guangyu Zhao<sup>1*</sup></span>
+      <span>Yongchang Zhang<sup>1*</sup></span>
+      <span>Ruizhang Jiang<sup>1*</sup></span>
+      <span>Zhihong Yu<sup>3</sup></span>
+      <span>Yuhao Zhang<sup>1</sup></span>
+      <span>Tao Wu<sup>4</sup></span>
+      <span>Qimin Zhou<sup>5</sup></span>
+      <span>Kunsong Shi<sup>2</sup></span>
+      <span>Haoran Wen<sup>2</sup></span>
+      <span>Zeyu Zhang<sup>6</sup></span>
+      <span>Yin Li<sup>7</sup></span>
+      <span>Kun Zhan<sup>2</sup></span>
+      <span>Yiwu Zhong<sup>1</sup></span>
+    </div>
+    <div class="affils">
+      <span><sup>1</sup>State Key Laboratory of General Artificial Intelligence, Peking University</span>
+      <span><sup>2</sup>Li Auto Inc.</span>
+      <span><sup>3</sup>Tsinghua University</span>
+      <span><sup>4</sup>Nanyang Technological University</span>
+      <span><sup>5</sup>Beijing University of Posts and Telecommunications</span>
+      <span><sup>6</sup>Beijing Institute for General Artificial Intelligence</span>
+      <span><sup>7</sup>University of Wisconsin - Madison</span>
+    </div>
+    <div class="venue"><sup>*</sup>Equal contribution</div>
+    <div class="btns">
+      <a class="btn" href="https://arxiv.org/abs/2611.26745" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9l4 3-4 3M13 15h3"/></svg>arXiv</a>
+      <a class="btn ghost" href="https://github.com/PKU-VaLuE-Lab/MomentMem" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>Code</a>
+    </div>
+
+    <p class="tldr">Many manipulation tasks require recalling <b>briefly visible details</b>, such as an object's previous location or a hidden texture pattern. We identify this as <b>visual moment memory</b>: retaining precise visual evidence for use after it is no longer visible. To study this problem, we introduce <b>VMBench</b>, whose tasks require robots to remember briefly visible locations, appearances, and their associations. We propose <b>MomentMem</b>, which decouples memory from action execution: a VLM memorizer selects and stores keyframes, and an executor policy uses these keyframes and the current observation to predict actions.</p>
+
+    <div class="hero-sim">
+      <video src="static/videos/sim/explore_cube_std.mp4" poster="static/videos/sim/explore_cube_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/mine_sweeper_std.mp4" poster="static/videos/sim/mine_sweeper_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/hidden_pattern_std.mp4" poster="static/videos/sim/hidden_pattern_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/seal_checking_std.mp4" poster="static/videos/sim/seal_checking_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/spring_compression_std.mp4" poster="static/videos/sim/spring_compression_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/drawer_match_std.mp4" poster="static/videos/sim/drawer_match_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/flash_beacon_std.mp4" poster="static/videos/sim/flash_beacon_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/scroll_discovery_std.mp4" poster="static/videos/sim/scroll_discovery_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/placement_imitation_std.mp4" poster="static/videos/sim/placement_imitation_std.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/explore_cube_ood.mp4" poster="static/videos/sim/explore_cube_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/mine_sweeper_ood.mp4" poster="static/videos/sim/mine_sweeper_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/hidden_pattern_ood.mp4" poster="static/videos/sim/hidden_pattern_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/seal_checking_ood.mp4" poster="static/videos/sim/seal_checking_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/spring_compression_ood.mp4" poster="static/videos/sim/spring_compression_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/drawer_match_ood.mp4" poster="static/videos/sim/drawer_match_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/flash_beacon_ood.mp4" poster="static/videos/sim/flash_beacon_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/scroll_discovery_ood.mp4" poster="static/videos/sim/scroll_discovery_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      <video src="static/videos/sim/placement_imitation_ood.mp4" poster="static/videos/sim/placement_imitation_ood.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+    </div>
+  </div>
+</header>
+
+<!-- ================= PROBLEM ================= -->
+<section id="problem">
+  <div class="wrap">
+    <div class="eyebrow">The problem</div>
+    <h2>What should a robot remember?</h2>
+    <p class="lead">Robots often need visual information that is no longer visible. How this information is stored determines whether precise details remain available for later actions.</p>
+
+    <div class="mem-cmp">
+      <div class="card mem">
+        <h3>Full history</h3>
+        <div class="viz"><div class="film" id="filmAll"></div></div>
+        <div class="verdict"><span class="plus">+</span> Complete</div>
+        <div class="verdict"><span class="minus">−</span> Redundant over long horizons</div>
+      </div>
+      <div class="card mem">
+        <h3>Text summary</h3>
+        <div class="viz"><div class="bubble">“The stamps were lifted.”<br><span class="muted small">…revealing <s>which colors, where?</s></span></div></div>
+        <div class="verdict"><span class="plus">+</span> Compact</div>
+        <div class="verdict"><span class="minus">−</span> Can omit precise visual details</div>
+      </div>
+      <div class="card mem ours">
+        <h3>Key moments <span class="tag ours" style="margin-left:6px">Ours</span></h3>
+        <div class="viz"><div class="keep"><img src="static/images/seal/key1.jpg" alt="Keyframe: color revealed under the first stamp"><img src="static/images/seal/key2.jpg" alt="Keyframe: color revealed under the second stamp"><span class="dots">···</span><img class="now" src="static/images/seal/now.jpg" alt="Current frame"></div></div>
+        <div class="verdict"><span class="plus">+</span> Sparse: a few keyframes per episode</div>
+        <div class="verdict"><span class="plus">+</span> Precise: raw images retain visual details</div>
+      </div>
+    </div>
+
+    <div class="instr">
+      <span>Hard to describe in text:</span>
+      <q>Put each cube on the color that was under the stamp.</q>
+      <span class="muted">Success depends on the exact color revealed at each location.</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= VMBENCH ================= -->
+<section id="vmbench">
+  <div class="wrap">
+    <div class="eyebrow">Benchmark</div>
+    <h2>VMBench: a benchmark for visual moment memory</h2>
+    <p class="lead">Each task requires remembering briefly visible locations, appearances, or their associations. This information varies across trials and guides later actions.</p>
+    <div class="bench-meta">
+      <span class="pill">9 closed-loop tasks</span>
+      <span class="pill">3 memory types</span>
+      <span class="pill">100 demos per task</span>
+      <span class="pill">Auto-annotated evidence intervals</span>
+      <span class="pill">Visual OOD variant for every task</span>
+      <span class="pill">ManiSkill3 · Franka Panda</span>
+    </div>
+
+    <div class="explorer">
+      <div class="card task-list" id="taskList" role="tablist" aria-label="VMBench tasks"></div>
+      <div class="card task-panel" id="taskPanel" role="tabpanel">
+        <div class="head">
+          <span class="cat-chip" id="tCat"></span>
+          <h3 id="tName" style="font-size:1.3rem"></h3>
+          <div class="toggle" id="oodToggle">
+            <button aria-pressed="true" data-v="std">Standard</button>
+            <button aria-pressed="false" data-v="ood">Visual OOD</button>
+          </div>
+        </div>
+        <p class="goal" id="tGoal"></p>
+        <div class="seq" id="tSeq"></div>
+        <div class="mem-row">
+          <div><span class="k">Remember</span><span id="tMem"></span></div>
+          <div><span class="k">Then</span><span id="tUse"></span></div>
+          <div class="seg-count"><span class="k">Key moments</span><b id="tSeg"></b></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= METHOD ================= -->
+<section id="method">
+  <div class="wrap">
+    <div class="eyebrow">Method</div>
+    <h2>MomentMem: decoupling memory from action</h2>
+    <p class="lead">A VLM memorizer selects and stores keyframes. A VLA executor uses these keyframes and the current observation to predict actions. The two modules communicate only through keyframes.</p>
+
+    <div class="card pipeline">
+      <div class="pipe">
+        <div class="node s">
+          <div class="stream" id="streamImgs"></div>
+          <div class="t">Camera stream</div>
+          <div class="d">recent frames, 5 Hz</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node m">
+          <div class="t">Memorizer</div>
+          <div class="d">Qwen3-VL-4B</div>
+          <div class="d" style="margin-top:6px;color:var(--text-2)">“Keep this frame?”</div>
+        </div>
+        <div class="arrow">→<small>yes</small></div>
+        <div class="node">
+          <div class="stack"><img src="static/images/frames/f5.jpg" alt=""><img src="static/images/frames/f3.jpg" alt=""><img src="static/images/frames/f6.jpg" alt=""></div>
+          <div class="t">Memory stack</div>
+          <div class="d">raw keyframes, in order</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node e">
+          <div class="t">Executor</div>
+          <div class="d">π0.5</div>
+          <div class="d" style="margin-top:6px;color:var(--text-2)">+ current view, state, instruction</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="t">Actions</div><div class="d">action chunk</div></div>
+      </div>
+      <div class="pipe-notes">
+        <div><b>Memory-aware selection.</b> The memorizer uses recent observations and existing memory to decide when to save a frame, avoiding duplicate storage.</div>
+        <div><b>Raw keyframes.</b> Keyframes preserve raw images, retaining the visual details needed for later actions.</div>
+        <div><b>Two-stage training.</b> The memorizer is trained first and then frozen to generate memories for the action demonstrations, on which the executor is trained.</div>
+      </div>
+    </div>
+
+    <div class="train">
+      <div class="card widget">
+        <h3>Segment-level memory supervision</h3>
+        <p class="muted small" style="margin:4px 0 0">Visual evidence often remains visible across several frames. We annotate an <b>evidence interval</b> rather than a single fixed frame.</p>
+        <div class="ctrl">
+          <button class="wbtn" id="resample">↻ Resample anchor</button>
+          <label class="chk"><input type="checkbox" id="missChk"> Memorizer missed the anchor</label>
+        </div>
+        <div class="frames" id="frames"></div>
+        <div class="legend">
+          <span><i style="background:var(--ours)"></i>keep (positive)</span>
+          <span><i style="background:var(--surface-2);border:1px solid var(--border)"></i>skip (negative)</span>
+          <span><i style="border:1px dashed var(--text-3)"></i>no loss</span>
+          <span><i style="background:var(--base-soft)"></i>missed</span>
+        </div>
+        <p class="explain" id="explain"></p>
+      </div>
+      <div class="card mini">
+        <h3>Ablation study</h3>
+        <p>Average VMBench success when each training choice is removed.</p>
+        <div id="ablation"></div>
+        <p class="small muted" style="margin-top:14px">Point annotation = one fixed positive frame per moment. w/o scheduled sampling = train only on perfect memory histories.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section id="results">
+  <div class="wrap">
+    <div class="eyebrow">Results</div>
+    <h2>Performance on simulated benchmarks</h2>
+    <p class="lead">Success rate per task for every method. Hover a row for a sorted list.</p>
+
+    <div class="card chart-card">
+      <div class="chart-top">
+        <div class="toggle" id="benchToggle">
+          <button aria-pressed="true" data-v="std">VMBench</button>
+          <button aria-pressed="false" data-v="ood">VMBench · Visual OOD</button>
+          <button aria-pressed="false" data-v="rm">RMBench</button>
+        </div>
+        <div class="chart-legend" id="benchLegend"></div>
+      </div>
+      <p class="chart-note" id="benchNote"></p>
+      <div class="bars" id="bars"></div>
+      <div class="axis"><span></span><div class="ticks"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card mini">
+        <h3>Few-shot adaptation to a new task</h3>
+        <p>Can the memorizer adapt to a new task with few memory annotations? We train the memorizer on eight VMBench tasks and adapt it to the held-out Flash Beacon task with only <b>five</b> memory-annotated demonstrations. All settings use the same 100 action demonstrations; few-shot refers only to memory supervision.</p>
+        <div id="fewshot"></div>
+      </div>
+      <div class="card mini">
+        <h3>Real-world experiments</h3>
+        <p>Successful trials out of 30 per task.</p>
+        <div id="waffles"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REAL ROBOT ================= -->
+<section id="real">
+  <div class="wrap">
+    <div class="eyebrow">Real robot</div>
+    <h2>Videos</h2>
+    <p class="lead"><b>Explore Cube</b>: the robot must find the cube hidden under one of three upside-down cups. Revisiting a cup counts as failure.</p>
+
+    <div class="rw-head">
+      <div class="subhead" style="margin:0"><span class="tag ours">MomentMem</span><h3>Successful episodes</h3></div>
+      <span class="tag speed" style="margin:0">All real-robot videos play at 4× speed</span>
+    </div>
+    <div class="rw-grid" id="oursGrid"></div>
+
+    <div class="subhead"><span class="tag base">π0.5</span><h3>Typical failure modes</h3></div>
+    <div class="rw-grid" id="piGrid"></div>
+
+  </div>
+</section>
+
+<!-- ================= CITATION ================= -->
+<section id="citation">
+  <div class="wrap">
+    <div class="eyebrow">Citation</div>
+    <h2>BibTeX</h2>
+    <div class="card bib">
+      <button class="wbtn copy-btn" id="copyBib" type="button">Copy</button>
+      <pre><code id="bibtex">@article{momentmem,
+  title={MomentMem: Memorizing Key Moments for Robot Manipulation},
+  author={Zhao, Guangyu and Zhang, Yongchang and Jiang, Ruizhang and Yu, Zhihong and Zhang, Yuhao and Wu, Tao and Zhou, Qimin and Shi, Kunsong and Wen, Haoran and Zhang, Zeyu and Li, Yin and Zhan, Kun and Zhong, Yiwu},
+  journal={arXiv preprint arXiv:2611.26745},
+  year={2026}
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<script src="static/js/main.js"></script>
+</body>
+</html>

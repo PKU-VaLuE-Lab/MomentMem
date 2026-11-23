@@ -1,0 +1,12 @@
+# Memorizer training; use a separate environment from OpenPI.
+torch==2.8.0
+torchvision==0.23.0
+transformers==4.57.6
+huggingface-hub==0.36.2
+accelerate==1.13.0
+deepspeed==0.19.1
+numpy==1.26.4
+Pillow>=11,<13
+opencv-python==4.11.0.86
+PyYAML>=6
+openai>=1.99,<3
